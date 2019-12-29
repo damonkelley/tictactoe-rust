@@ -1,4 +1,6 @@
+pub mod board;
 pub mod game;
+pub mod token;
 
 use game::Game;
 
@@ -42,8 +44,9 @@ impl<'a> GameLoop<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use game::{Outcome, Token};
+    use game::Outcome;
     use std::cell::*;
+    use token::Token;
 
     #[derive(Debug)]
     struct FakeGame {

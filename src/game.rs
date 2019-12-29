@@ -1,5 +1,5 @@
-use std::cell::RefCell;
-use std::collections::HashMap;
+use crate::board::Board;
+use crate::token::Token;
 
 pub trait Game: std::fmt::Debug {
     fn outcome(&self) -> Option<Outcome>;
@@ -68,52 +68,6 @@ impl TicTacToe {
         tokens.dedup();
 
         tokens
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub struct Token(String);
-
-impl Token {
-    pub fn new(value: &str) -> Token {
-        Token(String::from(value))
-    }
-
-    pub fn from(token: &Token) -> Token {
-        Token::new(&token.0)
-    }
-}
-
-#[derive(Debug)]
-struct Board {
-    state: RefCell<HashMap<i32, Token>>,
-}
-
-#[allow(dead_code)]
-impl Board {
-    fn put(&self, space: i32, token: Token) -> &Self {
-        self.state.borrow_mut().insert(space, token);
-        self
-    }
-
-    fn full(&self) -> bool {
-        let tokens = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            .iter()
-            .map(|space| self.get(*space))
-            .flatten()
-            .collect::<Vec<Token>>();
-
-        return tokens.len() == 9;
-    }
-
-    fn get(&self, space: i32) -> Option<Token> {
-        self.state.borrow().get(&space).map(Token::from)
-    }
-
-    fn new() -> Self {
-        Board {
-            state: RefCell::new(HashMap::new()),
-        }
     }
 }
 
