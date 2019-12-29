@@ -1,4 +1,4 @@
-use crate::board::Board;
+use crate::board::{Board, Space};
 use crate::token::Token;
 
 pub trait Game: std::fmt::Debug {
@@ -31,12 +31,15 @@ impl Game for TicTacToe {
     }
 }
 
+type Combination = Vec<Space>;
+type Combinations = Vec<Combination>;
+
 impl TicTacToe {
     pub fn new(board: Board) -> TicTacToe {
         TicTacToe { board }
     }
 
-    fn combinations(&self) -> Vec<Vec<i32>> {
+    fn combinations(&self) -> Combinations {
         vec![
             vec![1, 2, 3],
             vec![4, 5, 6],
@@ -58,7 +61,7 @@ impl TicTacToe {
         winning_combination.and_then(|combo| combo.first().map(Token::from))
     }
 
-    fn find_uniq_tokens(&self, spaces: &Vec<i32>) -> Vec<Token> {
+    fn find_uniq_tokens(&self, spaces: &Combination) -> Vec<Token> {
         let mut tokens = spaces
             .iter()
             .map(|space| self.board.get(*space))

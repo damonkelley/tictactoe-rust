@@ -2,13 +2,15 @@ use crate::token::Token;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
+pub type Space = i32;
+
 #[derive(Debug)]
 pub struct Board {
-    state: RefCell<HashMap<i32, Token>>,
+    state: RefCell<HashMap<Space, Token>>,
 }
 
 impl Board {
-    pub fn put(&self, space: i32, token: Token) -> &Self {
+    pub fn put(&self, space: Space, token: Token) -> &Self {
         self.state.borrow_mut().insert(space, token);
         self
     }
@@ -23,7 +25,7 @@ impl Board {
         return tokens.len() == 9;
     }
 
-    pub fn get(&self, space: i32) -> Option<Token> {
+    pub fn get(&self, space: Space) -> Option<Token> {
         self.state.borrow().get(&space).map(Token::from)
     }
 
