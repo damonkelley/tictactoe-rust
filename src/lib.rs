@@ -1,13 +1,12 @@
+pub mod game;
+
+use game::Game;
+
 #[derive(Debug)]
 struct GameLoop<'a> {
     game: &'a dyn Game,
     output: &'a dyn Output,
     presenter: &'a dyn Presenter,
-}
-
-trait Game: std::fmt::Debug {
-    fn outcome(&self) -> Option<Outcome>;
-    fn make_move(&self) -> &dyn Game;
 }
 
 trait Output: std::fmt::Debug {
@@ -18,10 +17,7 @@ trait Presenter: std::fmt::Debug {
     fn present(&self, game: &dyn Game) -> &str;
 }
 
-enum Outcome {
-    Winner,
-}
-
+#[allow(dead_code)]
 impl<'a> GameLoop<'a> {
     fn play(&self) {
         self.output.display(self.presenter.present(self.game));
@@ -46,6 +42,7 @@ impl<'a> GameLoop<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use game::{Outcome, Token};
     use std::cell::*;
 
     #[derive(Debug)]
@@ -57,7 +54,7 @@ mod tests {
         fn outcome(&self) -> Option<Outcome> {
             match self.log().len() < 2 {
                 true => None,
-                false => Some(Outcome::Winner),
+                false => Some(Outcome::Winner(Token::new(&"X"))),
             }
         }
 
