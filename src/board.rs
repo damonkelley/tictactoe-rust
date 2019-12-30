@@ -5,12 +5,12 @@ use std::collections::HashMap;
 pub type Space = i32;
 
 #[derive(Debug)]
-pub struct Board {
-    state: RefCell<HashMap<Space, Token>>,
+pub struct Board<'a> {
+    state: RefCell<HashMap<Space, Token<'a>>>,
 }
 
-impl Board {
-    pub fn put(&self, space: Space, token: Token) -> &Self {
+impl<'a> Board<'a> {
+    pub fn put(&self, space: Space, token: Token<'a>) -> &Self {
         self.state.borrow_mut().insert(space, token);
         self
     }
@@ -18,7 +18,7 @@ impl Board {
     pub fn full(&self) -> bool {
         let tokens = [1, 2, 3, 4, 5, 6, 7, 8, 9]
             .iter()
-            .map(|space| self.get(*space))
+            .map(|&space| self.get(space))
             .flatten()
             .collect::<Vec<Token>>();
 
@@ -26,7 +26,7 @@ impl Board {
     }
 
     pub fn get(&self, space: Space) -> Option<Token> {
-        self.state.borrow().get(&space).map(Token::from)
+        self.state.borrow().get(&space).map(|&token| token)
     }
 
     pub fn new() -> Self {

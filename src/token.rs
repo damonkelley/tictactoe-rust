@@ -1,12 +1,8 @@
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub struct Token(String);
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
+pub struct Token<'a>(&'a str);
 
-impl Token {
-    pub fn new(value: &str) -> Token {
-        Token(String::from(value))
-    }
-
-    pub fn from(token: &Token) -> Token {
-        Token::new(&token.0)
+impl<'a> Token<'a> {
+    pub fn new(value: &'a str) -> Token<'a> {
+        Token(value)
     }
 }

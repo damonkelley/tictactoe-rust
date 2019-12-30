@@ -6,18 +6,18 @@ pub trait Game: std::fmt::Debug {
     fn make_move(&self) -> &dyn Game;
 }
 
-#[derive(Debug, PartialEq)]
-pub enum Outcome {
-    Winner(Token),
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum Outcome<'a> {
+    Winner(Token<'a>),
     Draw,
 }
 
 #[derive(Debug)]
-struct TicTacToe {
-    board: Board,
+struct TicTacToe<'a> {
+    board: Board<'a>,
 }
 
-impl Game for TicTacToe {
+impl<'a> Game for TicTacToe<'a> {
     fn outcome(&self) -> Option<Outcome> {
         match self.find_winner() {
             Some(token) => Some(Outcome::Winner(token)),
@@ -34,7 +34,7 @@ impl Game for TicTacToe {
 type Combination = Vec<Space>;
 type Combinations = Vec<Combination>;
 
-impl TicTacToe {
+impl<'a> TicTacToe<'a> {
     pub fn new(board: Board) -> TicTacToe {
         TicTacToe { board }
     }
@@ -51,6 +51,7 @@ impl TicTacToe {
             vec![3, 5, 7],
         ]
     }
+
     fn find_winner(&self) -> Option<Token> {
         let winning_combination = self
             .combinations()
@@ -58,13 +59,13 @@ impl TicTacToe {
             .map(|spaces| self.find_uniq_tokens(spaces))
             .find(|item| item.len() == 1);
 
-        winning_combination.and_then(|combo| combo.first().map(Token::from))
+        winning_combination.and_then(|combo| combo.first().map(|&combo| combo))
     }
 
     fn find_uniq_tokens(&self, spaces: &Combination) -> Vec<Token> {
         let mut tokens = spaces
             .iter()
-            .map(|space| self.board.get(*space))
+            .map(|&space| self.board.get(space))
             .flatten()
             .collect::<Vec<Token>>();
 
@@ -99,13 +100,13 @@ mod tests {
         for combination in combinations.iter() {
             let board = Board::new();
 
-            combination.iter().for_each(|space| {
-                board.put(*space, Token::new(&"X"));
+            combination.iter().for_each(|&space| {
+                board.put(space, Token::new("X"));
             });
 
             assert_eq!(
                 TicTacToe::new(board).outcome(),
-                Some(Outcome::Winner(Token::new(&"X")))
+                Some(Outcome::Winner(Token::new("X")))
             )
         }
     }
@@ -115,15 +116,15 @@ mod tests {
         let board = Board::new();
 
         board
-            .put(1, Token::new(&"X"))
-            .put(2, Token::new(&"O"))
-            .put(3, Token::new(&"X"))
-            .put(4, Token::new(&"X"))
-            .put(5, Token::new(&"O"))
-            .put(6, Token::new(&"X"))
-            .put(7, Token::new(&"O"))
-            .put(8, Token::new(&"X"))
-            .put(9, Token::new(&"O"));
+            .put(1, Token::new("X"))
+            .put(2, Token::new("O"))
+            .put(3, Token::new("X"))
+            .put(4, Token::new("X"))
+            .put(5, Token::new("O"))
+            .put(6, Token::new("X"))
+            .put(7, Token::new("O"))
+            .put(8, Token::new("X"))
+            .put(9, Token::new("O"));
 
         assert_eq!(TicTacToe::new(board).outcome(), Some(Outcome::Draw))
     }

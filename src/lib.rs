@@ -49,15 +49,16 @@ mod tests {
     use token::Token;
 
     #[derive(Debug)]
-    struct FakeGame {
+    struct FakeGame<'a> {
         log: RefCell<Vec<String>>,
+        outcome: Outcome<'a>
     }
 
-    impl Game for FakeGame {
+    impl<'a> Game for FakeGame<'a> {
         fn outcome(&self) -> Option<Outcome> {
             match self.log().len() < 2 {
                 true => None,
-                false => Some(Outcome::Winner(Token::new(&"X"))),
+                false => Some(self.outcome),
             }
         }
 
@@ -67,7 +68,7 @@ mod tests {
         }
     }
 
-    impl FakeGame {
+    impl<'a> FakeGame<'a > {
         pub fn log(&self) -> Vec<String> {
             self.log.borrow().clone()
         }
@@ -103,6 +104,7 @@ mod tests {
     fn it_will_make_moves_until_the_game_is_over() {
         let game = FakeGame {
             log: RefCell::new(Vec::new()),
+            outcome: Outcome::Winner(Token::new("X"))
         };
 
         let output = FakeOutput {
@@ -118,6 +120,7 @@ mod tests {
     fn it_will_output_the_winner() {
         let game = FakeGame {
             log: RefCell::new(Vec::new()),
+            outcome: Outcome::Winner(Token::new("X"))
         };
 
         let output = FakeOutput {
@@ -133,6 +136,7 @@ mod tests {
     fn it_will_display_the_board() {
         let game = FakeGame {
             log: RefCell::new(Vec::new()),
+            outcome: Outcome::Winner(Token::new("X"))
         };
 
         let output = FakeOutput {
