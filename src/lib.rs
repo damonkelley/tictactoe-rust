@@ -24,10 +24,15 @@ impl<'a> GameLoop<'a> {
     fn play(&self) {
         self.output.display(self.presenter.present(self.game));
 
-        while self.game.outcome().is_none() {
+        let turn = || {
             self.game.make_move();
             self.output.display(self.presenter.present(self.game));
-        }
+            self.game
+        };
+
+        std::iter::repeat_with(turn)
+            .take_while(|game| game.outcome().is_none())
+            .for_each(drop);
 
         self.game.outcome().map(|_| self.output.display("Winner"));
     }
