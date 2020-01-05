@@ -9,4 +9,8 @@ edition = "2018"
 name = "tictactoe"
 path = "src/lib.rs"
 
+[features]
+unstable = ["clippy"]
+
 [dependencies]
+clippy = { version = "*", optional = true }

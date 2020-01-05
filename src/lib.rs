@@ -1,3 +1,4 @@
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
 pub mod board;
 pub mod game;
 pub mod token;
@@ -34,7 +35,9 @@ impl<'a> GameLoop<'a> {
             .take_while(|game| game.outcome().is_none())
             .for_each(drop);
 
-        self.game.outcome().map(|_| self.output.display("Winner"));
+        if let Some(_) = self.game.outcome() {
+            self.output.display("Winner")
+        }
     }
 
     fn new(game: &'a dyn Game, output: &'a dyn Output, presenter: &'a dyn Presenter) -> Self {
@@ -56,14 +59,15 @@ mod tests {
     #[derive(Debug)]
     struct FakeGame<'a> {
         log: RefCell<Vec<String>>,
-        outcome: Outcome<'a>
+        outcome: Outcome<'a>,
     }
 
     impl<'a> Game for FakeGame<'a> {
         fn outcome(&self) -> Option<Outcome> {
-            match self.log().len() < 2 {
-                true => None,
-                false => Some(self.outcome),
+            if self.log().len() < 2 {
+                None
+            } else {
+                Some(self.outcome)
             }
         }
 
@@ -73,7 +77,7 @@ mod tests {
         }
     }
 
-    impl<'a> FakeGame<'a > {
+    impl<'a> FakeGame<'a> {
         pub fn log(&self) -> Vec<String> {
             self.log.borrow().clone()
         }
@@ -109,7 +113,7 @@ mod tests {
     fn it_will_make_moves_until_the_game_is_over() {
         let game = FakeGame {
             log: RefCell::new(Vec::new()),
-            outcome: Outcome::Winner(Token::new("X"))
+            outcome: Outcome::Winner(Token::new("X")),
         };
 
         let output = FakeOutput {
@@ -125,7 +129,7 @@ mod tests {
     fn it_will_output_the_winner() {
         let game = FakeGame {
             log: RefCell::new(Vec::new()),
-            outcome: Outcome::Winner(Token::new("X"))
+            outcome: Outcome::Winner(Token::new("X")),
         };
 
         let output = FakeOutput {
@@ -141,7 +145,7 @@ mod tests {
     fn it_will_display_the_board() {
         let game = FakeGame {
             log: RefCell::new(Vec::new()),
-            outcome: Outcome::Winner(Token::new("X"))
+            outcome: Outcome::Winner(Token::new("X")),
         };
 
         let output = FakeOutput {

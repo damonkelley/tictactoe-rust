@@ -23,8 +23,9 @@ struct Turn<'a> {
     tokens: RefCell<Box<dyn Iterator<Item = Token<'a>> + 'a>>,
 }
 
+#[allow(dead_code)]
 impl<'a> Turn<'a> {
-    fn new(tokens: &'a Vec<Token<'a>>) -> Self {
+    fn new(tokens: &'a [Token<'a>]) -> Self {
         Turn {
             tokens: RefCell::new(Box::new(tokens.iter().copied().cycle())),
         }
@@ -62,18 +63,19 @@ impl<'a> Game for TicTacToe<'a> {
 
         maybe_input.and_then(|space| maybe_token.map(|token| self.board.put(space, token)));
 
-        return self;
+        self
     }
 }
 
 type Combination = Vec<Space>;
 type Combinations = Vec<Combination>;
 
+#[allow(dead_code)]
 impl<'a> TicTacToe<'a> {
     pub fn new(
         board: &'a Board<'a>,
         get_input: &'a dyn GetInput,
-        tokens: &'a Vec<Token<'a>>,
+        tokens: &'a [Token<'a>],
     ) -> TicTacToe<'a> {
         TicTacToe {
             board,
@@ -102,14 +104,13 @@ impl<'a> TicTacToe<'a> {
             .map(|spaces| self.find_uniq_tokens(spaces))
             .find(|item| item.len() == 1);
 
-        winning_combination.and_then(|combo| combo.first().map(|&combo| combo))
+        winning_combination.and_then(|combo| combo.first().copied())
     }
 
     fn find_uniq_tokens(&self, spaces: &Combination) -> Vec<Token> {
         let mut tokens = spaces
             .iter()
-            .map(|&space| self.board.get(space))
-            .flatten()
+            .flat_map(|&space| self.board.get(space))
             .collect::<Vec<Token>>();
 
         tokens.dedup();
@@ -132,7 +133,7 @@ mod tests {
         }
     }
 
-    fn stubbed_input<'a>(moves: &'a Vec<Space>) -> StubbedInput<'a> {
+    fn stubbed_input(moves: &[Space]) -> StubbedInput {
         StubbedInput {
             moves: RefCell::new(Box::new(moves.iter().copied())),
         }
@@ -143,8 +144,8 @@ mod tests {
         assert_eq!(
             TicTacToe::new(
                 &Board::new(),
-                &stubbed_input(&vec![1]),
-                &vec![Token::new("X"), Token::new("O")]
+                &stubbed_input(&[1]),
+                &[Token::new("X"), Token::new("O")]
             )
             .outcome(),
             None
@@ -164,7 +165,7 @@ mod tests {
             [3, 5, 7],
         ];
 
-        for combination in combinations.iter() {
+        for combination in &combinations {
             let moves = vec![1];
             let get_input = stubbed_input(&moves);
             let tokens = vec![Token::new("X"), Token::new("O")];

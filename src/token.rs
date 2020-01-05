@@ -2,7 +2,8 @@
 pub struct Token<'a>(&'a str);
 
 impl<'a> Token<'a> {
-    pub fn new(value: &'a str) -> Token<'a> {
+    #[must_use]
+    pub const fn new(value: &'a str) -> Token<'a> {
         Token(value)
     }
 }
