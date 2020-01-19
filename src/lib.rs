@@ -1,14 +1,13 @@
 #![warn(clippy::all, clippy::pedantic, clippy::nursery)]
+mod game;
+use game::Game;
+
 trait RunContext {
     fn run(&self) -> bool;
 }
 
 trait UI {
     fn update(&mut self) -> &mut Self;
-}
-
-trait Game {
-    fn turn(&mut self) -> &mut Self;
 }
 
 #[allow(dead_code)]
